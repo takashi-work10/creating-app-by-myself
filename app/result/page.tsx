@@ -126,8 +126,8 @@ if (!result) {
     );
 }
 
-// traitごとの擬似スコア
-const data = TRAITS.map((trait, i) => ({
+// 'i' を外し、trait のみを受け取るよう変更
+const data = TRAITS.map((trait) => ({
     trait,
     value: Math.round((score / 120) * 10 + Math.random() * 5),
 }));
@@ -177,7 +177,7 @@ return (
         (スコア: {score} 点／{result.range} 点)
         </Typography>
 
-        <Box sx={{ width: '100%', height: { xs: 240, sm: 320 }, my: 2 }}>
+        <Box sx={{ width: '100%', height: 240, my: 2 }}>
         <ResponsiveContainer width="100%" height="100%">
             <RadarChart outerRadius={80} data={data}>
             <PolarGrid />
