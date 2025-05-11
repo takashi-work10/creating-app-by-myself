@@ -1,4 +1,3 @@
-// app/diagnosis/page.tsx
 'use client';
 
 import React, { useRef, useState } from 'react';
@@ -15,7 +14,7 @@ import {
   Button,
 } from '@mui/material';
 
-const QUESTIONS: string[] = [
+const QUESTIONS = [
   '突然の動悸や胸の痛みを感じることがある',
   '息苦しさや呼吸がしにくくなることがある',
   '手足のしびれや震えを感じることがある',
@@ -38,35 +37,27 @@ const QUESTIONS: string[] = [
   '「また起きたらどうしよう」と考えすぎてしまう',
 ];
 
-const RADIO_OPTIONS = [1, 2, 3, 4, 5].map((n) => ({ value: n.toString() }));
-
-// ヘッダー固定用の高さ（px）
-const HEADER_HEIGHT = 64;
+const RADIO_VALUES = ['1','2','3','4','5'];
 
 export default function DiagnosisPage() {
   const router = useRouter();
-  const [answers, setAnswers] = useState<string[]>(
-    Array(QUESTIONS.length).fill('')
-  );
+  const [answers, setAnswers] = useState<string[]>(Array(QUESTIONS.length).fill(''));
   const questionRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  const HEADER_HEIGHT = 64;
 
   const handleChange = (idx: number, val: string) => {
     const next = [...answers];
     next[idx] = val;
     setAnswers(next);
-
-    // 次の質問へスクロール
     const nextEl = questionRefs.current[idx + 1];
     if (nextEl) {
-      const top =
-        nextEl.getBoundingClientRect().top +
-        window.pageYOffset -
-        HEADER_HEIGHT;
+      const top = nextEl.getBoundingClientRect().top + window.pageYOffset - HEADER_HEIGHT;
       window.scrollTo({ top, behavior: 'smooth' });
     }
   };
 
-  const answeredCount = answers.filter((a) => a !== '').length;
+  const answeredCount = answers.filter(a => a).length;
   const progress = (answeredCount / QUESTIONS.length) * 100;
 
   const handleSubmit = () => {
@@ -74,8 +65,8 @@ export default function DiagnosisPage() {
       alert('すべての質問に答えてください');
       return;
     }
-    const totalScore = answers.reduce((sum, v) => sum + Number(v), 0);
-    router.push(`/result?score=${totalScore}`);
+    const total = answers.reduce((sum, v) => sum + Number(v), 0);
+    router.push(`/result?score=${total}`);
   };
 
   return (
@@ -100,10 +91,10 @@ export default function DiagnosisPage() {
           backdropFilter: 'blur(6px)',
           borderRadius: 2,
           boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-          overflow: 'hidden',
+          overflow: 'visible',
         }}
       >
-        {/* 固定ヘッダー */}
+        {/* Sticky progress header */}
         <Box
           sx={{
             position: 'sticky',
@@ -116,7 +107,7 @@ export default function DiagnosisPage() {
             borderBottom: '1px solid #E0E0E0',
           }}
         >
-          <Typography variant="body2" align="center">
+          <Typography variant="body2" align="center" sx={{ fontWeight: 500 }}>
             {answeredCount} / {QUESTIONS.length} 問回答済み
           </Typography>
           <LinearProgress
@@ -161,6 +152,7 @@ export default function DiagnosisPage() {
                     color: '#FFF',
                     borderRadius: 1,
                     fontWeight: 600,
+                    fontSize: '0.75rem',
                   }}
                 >
                   Q{i + 1}
@@ -173,17 +165,21 @@ export default function DiagnosisPage() {
               <RadioGroup
                 row
                 value={answers[i]}
-                onChange={(e) => handleChange(i, e.target.value)}
-                sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+                onChange={e => handleChange(i, e.target.value)}
+                sx={{
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
               >
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="body2" color="text.secondary">
                   思わない
                 </Typography>
+
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                  {RADIO_OPTIONS.map((opt) => (
+                  {RADIO_VALUES.map(val => (
                     <FormControlLabel
-                      key={opt.value}
-                      value={opt.value}
+                      key={val}
+                      value={val}
                       control={
                         <Radio
                           sx={{
@@ -199,7 +195,8 @@ export default function DiagnosisPage() {
                     />
                   ))}
                 </Box>
-                <Typography variant="caption" color="text.secondary">
+
+                <Typography variant="body2" color="text.secondary">
                   思う
                 </Typography>
               </RadioGroup>
@@ -209,9 +206,9 @@ export default function DiagnosisPage() {
           <Box sx={{ px: 2, pb: 2 }}>
             <Button
               fullWidth
+              variant="contained"
               onClick={handleSubmit}
               disabled={answeredCount < QUESTIONS.length}
-              variant="contained"
               sx={{
                 py: 1.75,
                 borderRadius: 3,
